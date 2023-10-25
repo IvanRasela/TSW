@@ -28,6 +28,9 @@ body {
 
 header {
     text-align: center;
+    grid-area: header;
+    padding: 10px;
+    display: flex;
 }
 
 header h1 {
