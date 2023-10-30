@@ -116,14 +116,16 @@ class UserController extends BaseController {
 	public function register() {
 
 		$user = new User();
-
-		if (isset($_POST["alias"]) && isset($_POST["passwd"])){ // reaching via HTTP Post...
-
+		echo("Dentro de register()");
+		var_dump($_POST);
+		if (isset($_POST["alias"]) && isset($_POST["passwd"]) && isset($_POST["email"])){ // reaching via HTTP Post...
+			
 			// populate the User object with data form the form
 			$user->setAlias($_POST["alias"]);
 			$user->setPassword($_POST["passwd"]);
-			echo("Intentando registrar usuario ");
+			$user->setEmail($_POST["email"]);
 			try{
+				
 				$user->checkIsValidForRegister(); // if it fails, ValidationException
 
 				// check if user exists in the database

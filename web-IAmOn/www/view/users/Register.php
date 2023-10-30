@@ -28,7 +28,7 @@ $view->setVariable("title", "Register");
                 value="<?= $user->getAlias() ?>">
                 <?= isset($errors["alias"])?$errors["alias"]:"" ?><br>
 
-                <p id="password">Contraseña: </p> <input type="password" name="password"
+                <p id="password">Contraseña: </p> <input type="password" name="passwd"
                 value="">
                 <?= isset($errors["passwd"])?$errors["passwd"]:"" ?><br>
 
