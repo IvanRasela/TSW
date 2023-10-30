@@ -1,4 +1,13 @@
 Register.php
+<?php
+//file: view/users/register.php
+
+require_once(__DIR__."/../../core/ViewManager.php");
+$view = ViewManager::getInstance();
+$errors = $view->getVariable("errors");
+$user = $view->getVariable("usuario");
+$view->setVariable("title", "Register");
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -14,17 +23,21 @@ Register.php
             <h1>Registro en IAmOn</h1>
         </header>
         <main>
-            <form method="post" action="\controller\UserController.php">
-                <label for="username">Usuario:</label>
-                <input type="text" id="username" name="username" required>
+            <form action="index.php?controller=user&amp;action=register" method="POST">
+                <p id="username">Alias: </p> <input type="text" name="alias"
+                value="<?= $user->getAlias() ?>">
+                <?= isset($errors["alias"])?i18n($errors["alias"]):"" ?><br>
 
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required>
+                <p id="password">Contraseña: </p> <input type="password" name="password"
+                value="">
+                <?= isset($errors["passwd"])?i18n($errors["passwd"]):"" ?><br>
 
-                <label for="email">Correo (si deseas recibir notificaciones):</label>
-                <input type="email" id="email" name="email">
+                <p id="email">Correo (Si deseas recibir notificaciones): </p> <input type="email" name="email"
+                value="">
+                <?= isset($errors["email"])?i18n($errors["email"]):"" ?><br>
 
-                <button type="submit">Registrarse</button>
+                <input type="submit" value="Registrarse">
+
             </form>
         </main>
         <footer>

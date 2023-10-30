@@ -4,7 +4,7 @@ UserController.php
 <?php
 
 require_once(__DIR__."/../core/ViewManager.php");
-//require_once(__DIR__."/../core/I18n.php");
+require_once(__DIR__."/../core/I18n.php");
 require_once(__DIR__."/../model/User.php");
 require_once(__DIR__."/../model/UserMapper.php");
 
@@ -28,6 +28,7 @@ class UserController extends BaseController {
 	private $userMapper;
 
 	public function __construct() {
+		echo("Dentro del __construct() del UserController.php ");
 		parent::__construct();
 
 		$this->userMapper = new UserMapper();
@@ -36,7 +37,6 @@ class UserController extends BaseController {
 		// different to the "default" layout where the internal
 		// menu is displayed
 		$this->view->setLayout("welcome");
-		echo("Hola estoy dentro de aki");
 	}
 
 	/**
@@ -117,12 +117,12 @@ class UserController extends BaseController {
 
 		$user = new User();
 
-		if (isset($_POST["alias"])){ // reaching via HTTP Post...
+		if (isset($_POST["alias"]) && isset($_POST["passwd"])){ // reaching via HTTP Post...
 
 			// populate the User object with data form the form
 			$user->setAlias($_POST["alias"]);
 			$user->setPassword($_POST["passwd"]);
-
+			echo("Intentando registrar usuario ");
 			try{
 				$user->checkIsValidForRegister(); // if it fails, ValidationException
 
@@ -132,16 +132,9 @@ class UserController extends BaseController {
 					// save the User object into the database
 					$this->userMapper->save($user);
 
-					// POST-REDIRECT-GET
-					// Everything OK, we will redirect the user to the list of posts
-					// We want to see a message after redirection, so we establish
-					// a "flash" message (which is simply a Session variable) to be
-					// get in the view after redirection.
 					$this->view->setFlash("Alias ".$user->getAlias()." successfully added. Please login now");
+					echo("Añadido el usuario a la base de datos correctamente. ");
 
-					// perform the redirection. More or less:
-					// header("Location: index.php?controller=users&action=login")
-					// die();
 					$this->view->redirect("users", "Inicio");
 				} else {
 					$errors = array();
@@ -157,7 +150,7 @@ class UserController extends BaseController {
 		}
 
 		// Put the User object visible to the view
-		$this->view->setVariable("alias", $user);
+		$this->view->setVariable("usuario", $user);
 
 		// render the view (/view/users/register.php)
 		$this->view->render("users", "Register");

@@ -33,7 +33,7 @@ class UserMapper {
 	* @return void
 	*/
 	public function save($user) {
-		$stmt = $this->db->prepare("INSERT INTO users values (?,?,?)");
+		$stmt = $this->db->prepare("INSERT INTO usuario values (?,?,?)");
 		$stmt->execute(array($user->getAlias(), $user->getPasswd()), $user->getEmail());
 	}
 
@@ -44,7 +44,7 @@ class UserMapper {
 	* @return boolean true if the username exists, false otherwise
 	*/
 	public function aliasExists($alias) {
-		$stmt = $this->db->prepare("SELECT count(alias) FROM users where alias=?");
+		$stmt = $this->db->prepare("SELECT count(alias) FROM usuario where alias=?");
 		$stmt->execute(array($alias));
 
 		if ($stmt->fetchColumn() > 0) {
@@ -52,8 +52,21 @@ class UserMapper {
 		}
 	}
 
+	public function emailExists($email) {
+		$stmt = $this->db->prepare("SELECT count(email) FROM usuario where email=?");
+		$stmt->execute(array($email));
+
+		if ($stmt->fetchColumn() > 0) {
+			return true;
+		}
+		//En php, si no se especifica un valor de retorno, la función
+		//	devolverá automáticamente null al final de su ejecución. 
+	}
+
+
+
 	/**
-	* Checks if a given pair of username/password exists in the database
+	* Checks if a given pair of alias/password/email exists in the database
 	*
 	* @param string $username the username
 	* @param string $passwd the password
