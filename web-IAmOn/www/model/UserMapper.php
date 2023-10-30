@@ -34,7 +34,12 @@ class UserMapper {
 	*/
 	public function save($user) {
 		$stmt = $this->db->prepare("INSERT INTO usuario values (?,?,?)");
-		$stmt->execute(array($user->getAlias(), $user->getPasswd()), $user->getEmail());
+		$result = $stmt->execute(array($user->getAlias(), $user->getPasswd(), $user->getEmail()));
+		if ($result) {
+			echo "Usuario guardado correctamente en la base de datos.";
+		} else {
+			echo "Error al guardar el usuario en la base de datos.";
+		}
 	}
 
 	/**
@@ -74,7 +79,7 @@ class UserMapper {
 	*/
 	public function isValidUser($alias, $passwd, $email) {
 		$stmt = $this->db->prepare("SELECT count(alias) FROM usuario where alias=? and passwd=? and email=?");
-		$stmt->execute(array($username, $passwd, $email));
+		$stmt->execute(array($alias, $passwd, $email));
 
 		if ($stmt->fetchColumn() > 0) {
 			return true;

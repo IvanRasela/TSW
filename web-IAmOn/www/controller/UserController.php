@@ -133,7 +133,6 @@ class UserController extends BaseController {
 					$this->userMapper->save($user);
 
 					$this->view->setFlash("Alias ".$user->getAlias()." successfully added. Please login now");
-					echo("Añadido el usuario a la base de datos correctamente. ");
 
 					$this->view->redirect("users", "Inicio");
 				} else {

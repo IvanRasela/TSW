@@ -26,15 +26,15 @@ $view->setVariable("title", "Register");
             <form action="index.php?controller=user&amp;action=register" method="POST">
                 <p id="username">Alias: </p> <input type="text" name="alias"
                 value="<?= $user->getAlias() ?>">
-                <?= isset($errors["alias"])?i18n($errors["alias"]):"" ?><br>
+                <?= isset($errors["alias"])?$errors["alias"]:"" ?><br>
 
                 <p id="password">Contraseña: </p> <input type="password" name="password"
                 value="">
-                <?= isset($errors["passwd"])?i18n($errors["passwd"]):"" ?><br>
+                <?= isset($errors["passwd"])?$errors["passwd"]:"" ?><br>
 
                 <p id="email">Correo (Si deseas recibir notificaciones): </p> <input type="email" name="email"
                 value="">
-                <?= isset($errors["email"])?i18n($errors["email"]):"" ?><br>
+                <?= isset($errors["email"])?$errors["email"]:"" ?><br>
 
                 <input type="submit" value="Registrarse">
 
