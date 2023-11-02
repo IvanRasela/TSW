@@ -1,10 +1,12 @@
 
 UserController.php
 
+
 <?php
 
 require_once(__DIR__."/../core/ViewManager.php");
 require_once(__DIR__."/../core/I18n.php");
+
 require_once(__DIR__."/../model/User.php");
 require_once(__DIR__."/../model/UserMapper.php");
 
@@ -17,7 +19,7 @@ require_once(__DIR__."/../controller/BaseController.php");
 *
 * @author lipido <lipido@gmail.com>
 */
-class UserController extends BaseController {
+class UsersController extends BaseController {
 
 	/**
 	* Reference to the UserMapper to interact
@@ -28,7 +30,6 @@ class UserController extends BaseController {
 	private $userMapper;
 
 	public function __construct() {
-		echo("Dentro del __construct() del UserController.php ");
 		parent::__construct();
 
 		$this->userMapper = new UserMapper();
@@ -67,23 +68,24 @@ class UserController extends BaseController {
 	* @return void
 	*/
 	public function login() {
-		if (isset($_POST["alias"])){ // reaching via HTTP Post...
+		if (isset($_POST["username"])){ // reaching via HTTP Post...
 			//process login form
-			if ($this->userMapper->isValidUser($_POST["alias"], 							 $_POST["passwd"])) {
+			if ($this->userMapper->isValidUser($_POST["username"], 							 $_POST["passwd"])) {
 
-				$_SESSION["currentuser"]=$_POST["alias"];
+				$_SESSION["currentuser"]=$_POST["username"];
 
 				// send user to the restricted area (HTTP 302 code)
-				$this->view->redirect("switch", "index");
+				$this->view->redirect("posts", "index");
 
 			}else{
 				$errors = array();
-				$errors["general"] = "Alias no valido";
+				$errors["general"] = "Username is not valid";
 				$this->view->setVariable("errors", $errors);
 			}
 		}
 
-		$this->view->render("user", "Inicio");
+		// render the view (/view/users/login.php)
+		$this->view->render("users", "login");
 	}
 
 	/**
@@ -116,30 +118,36 @@ class UserController extends BaseController {
 	public function register() {
 
 		$user = new User();
-		echo("Dentro de register()");
-		var_dump($_POST);
-		if (isset($_POST["alias"]) && isset($_POST["passwd"]) && isset($_POST["email"])){ // reaching via HTTP Post...
-			
+
+		if (isset($_POST["username"])){ // reaching via HTTP Post...
+
 			// populate the User object with data form the form
-			$user->setAlias($_POST["alias"]);
+			$user->setUsername($_POST["username"]);
 			$user->setPassword($_POST["passwd"]);
-			$user->setEmail($_POST["email"]);
+
 			try{
-				
 				$user->checkIsValidForRegister(); // if it fails, ValidationException
 
 				// check if user exists in the database
-				if (!$this->userMapper->aliasExists($_POST["alias"])){
+				if (!$this->userMapper->usernameExists($_POST["username"])){
 
 					// save the User object into the database
 					$this->userMapper->save($user);
 
-					$this->view->setFlash("Alias ".$user->getAlias()." successfully added. Please login now");
+					// POST-REDIRECT-GET
+					// Everything OK, we will redirect the user to the list of posts
+					// We want to see a message after redirection, so we establish
+					// a "flash" message (which is simply a Session variable) to be
+					// get in the view after redirection.
+					$this->view->setFlash("Username ".$user->getUsername()." successfully added. Please login now");
 
-					$this->view->redirect("users", "Inicio");
+					// perform the redirection. More or less:
+					// header("Location: index.php?controller=users&action=login")
+					// die();
+					$this->view->redirect("users", "login");
 				} else {
 					$errors = array();
-					$errors["alias"] = "El alias ya existe";
+					$errors["username"] = "Username already exists";
 					$this->view->setVariable("errors", $errors);
 				}
 			}catch(ValidationException $ex) {
@@ -151,10 +159,10 @@ class UserController extends BaseController {
 		}
 
 		// Put the User object visible to the view
-		$this->view->setVariable("usuario", $user);
+		$this->view->setVariable("user", $user);
 
 		// render the view (/view/users/register.php)
-		$this->view->render("users", "Register");
+		$this->view->render("users", "register");
 
 	}
 
@@ -178,7 +186,7 @@ class UserController extends BaseController {
 		// perform a redirection. More or less:
 		// header("Location: index.php?controller=users&action=login")
 		// die();
-		$this->view->redirect("users", "Inicio");
+		$this->view->redirect("users", "login");
 
 	}
 

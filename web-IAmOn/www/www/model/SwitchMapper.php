@@ -1,5 +1,4 @@
-UserMapper.php
-
+SwitchMapper.php
 <?php
 // file: model/UserMapper.php
 include('Mail.php');

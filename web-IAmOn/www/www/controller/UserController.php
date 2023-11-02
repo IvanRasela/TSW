@@ -74,7 +74,7 @@ class UserController extends BaseController {
 				$_SESSION["currentuser"]=$_POST["alias"];
 
 				// send user to the restricted area (HTTP 302 code)
-				$this->view->redirect("switch", "index");
+				$this->view->redirect("posts", "index");
 
 			}else{
 				$errors = array();
@@ -83,7 +83,7 @@ class UserController extends BaseController {
 			}
 		}
 
-		$this->view->render("user", "Inicio");
+		$this->view->render("users", "Inicio");
 	}
 
 	/**
