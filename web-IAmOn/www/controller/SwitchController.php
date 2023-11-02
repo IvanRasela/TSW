@@ -3,10 +3,8 @@ UserController.php
 
 <?php
 //file: controller/PostController.php
-
-require_once(__DIR__."/../model/Comment.php");
-require_once(__DIR__."/../model/Post.php");
-require_once(__DIR__."/../model/PostMapper.php");
+require_once(__DIR__."/../model/Switch.php");
+require_once(__DIR__."/../model/SwitchMapper.php");
 require_once(__DIR__."/../model/User.php");
 
 require_once(__DIR__."/../core/ViewManager.php");
@@ -19,20 +17,20 @@ require_once(__DIR__."/../controller/BaseController.php");
 *
 * @author lipido <lipido@gmail.com>
 */
-class PostsController extends BaseController {
+class SwitchsController extends BaseController {
 
 	/**
 	* Reference to the PostMapper to interact
 	* with the database
 	*
-	* @var PostMapper
+	* @var SwitchMapper
 	*/
-	private $postMapper;
+	private $SwitchMapper;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->postMapper = new PostMapper();
+		$this->SwitchMapper = new SwitchMapper();
 	}
 
 	/**
@@ -47,12 +45,13 @@ class PostsController extends BaseController {
 	* </ul>
 	*/
 	public function index() {
+		echo("Dentro de la action index de SwitchController.php");
 
 		// obtain the data from the database
-		$posts = $this->postMapper->findAll();
+		$switchs = $this->SwitchMapper->findAll();
 
 		// put the array containing Post object to the view
-		$this->view->setVariable("posts", $posts);
+		$this->view->setVariable("Switch", $switchs);
 
 		// render the view (/view/posts/index.php)
 		$this->view->render("posts", "index");
@@ -82,15 +81,16 @@ class PostsController extends BaseController {
 	* @return void
 	*
 	*/
+	/*COMPLETAR*/ 
 	public function view(){
 		if (!isset($_GET["id"])) {
 			throw new Exception("id is mandatory");
 		}
 
-		$postid = $_GET["id"];
+		$switchPK = $_GET["Public_UUID"];
 
 		// find the Post object in the database
-		$post = $this->postMapper->findByIdWithComments($postid);
+		$switch = $this->switchMapper->findByIdWithComments($postid);
 
 		if ($post == NULL) {
 			throw new Exception("no such post with id: ".$postid);
@@ -311,8 +311,8 @@ class PostsController extends BaseController {
 		}
 		
 		// Get the Post object from the database
-		$switchname = $_REQUEST["SwitchName"];
-		$switch = $this->switchMapper->findById($postid);
+		$postid = $_REQUEST["id"];
+		$post = $this->postMapper->findById($postid);
 
 		// Does the post exist?
 		if ($post == NULL) {

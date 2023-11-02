@@ -15,7 +15,7 @@ require_once(__DIR__."/../model/Switch.php");
 *
 * @author lipido <lipido@gmail.com>
 */
-class PostMapper {
+class SwitchMapper {
 
 	/**
 	* Reference to the PDO connection
@@ -37,6 +37,20 @@ class PostMapper {
 	*/
 	public function findAll() {
 		$stmt = $this->db->query("SELECT * FROM Switch, Usuario WHERE Usuario.Alias = Switch.AliasUser");
+		$switch_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+		$switchs = array();
+
+		foreach ($switch_db as $switch) {
+			$alias = new User($switch["alias"]);
+			array_push($switchs, new Switch($switch["SwitchName"], $switch["Private_UUID"], $switch["Public_UUID"], $switch["LastTimePowerOn"], $switch["MaxTimePowerOn"], $switch["DescriptionSwitch"], $switch["SwitchState"],$alias));
+		}
+
+		return $switchs;
+	}
+
+	public function findIfSuscribe() {
+		$stmt = $this->db->query("SELECT * FROM Suscritos, Usuario WHERE Usuario.Alias = Switch.AliasUser");
 		$switch_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		$switchs = array();

@@ -16,7 +16,7 @@ require_once(__DIR__ . "/../../core/I18n.php");
 </head>
 <body>
 	<header>
-		<h1><?= i18n("Welcome to the Blog App!") ?></h1>
+		<h1><?= i18n("Welcome to IAmOn!") ?></h1>
 	</header>
 	<main>
 		<!-- flash message -->

@@ -9,21 +9,9 @@ $user = $view->getVariable("usuario");
 $view->setVariable("title", "Register");
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/register.css">
-    <title>Registro - IAmOn</title>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Registro en IAmOn</h1>
-        </header>
-        <main>
-            <form action="index.php?controller=user&amp;action=register" method="POST">
+
+<h1>Registro en IAmOn</h1>
+            <form action="index.php?controller=users&amp;action=register" method="POST">
                 <p id="username">Alias: </p> <input type="text" name="alias"
                 value="<?= $user->getAlias() ?>">
                 <?= isset($errors["alias"])?$errors["alias"]:"" ?><br>
@@ -38,11 +26,3 @@ $view->setVariable("title", "Register");
 
                 <input type="submit" value="Registrarse">
 
-            </form>
-        </main>
-        <footer>
-            <p>¿Ya tienes una cuenta? <a href="../inicio.html">Inicia Sesión</a></p>
-        </footer>
-    </div>
-</body>
-</html>
