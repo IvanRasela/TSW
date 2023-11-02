@@ -136,7 +136,7 @@ class UserController extends BaseController {
 
 					$this->view->setFlash("Alias ".$user->getAlias()." successfully added. Please login now");
 
-					$this->view->redirect("users", "Inicio");
+					$this->view->redirect("user", "Inicio");
 				} else {
 					$errors = array();
 					$errors["alias"] = "El alias ya existe";
@@ -178,7 +178,7 @@ class UserController extends BaseController {
 		// perform a redirection. More or less:
 		// header("Location: index.php?controller=users&action=login")
 		// die();
-		$this->view->redirect("users", "Inicio");
+		$this->view->redirect("user", "Inicio");
 
 	}
 

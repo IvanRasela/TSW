@@ -311,8 +311,8 @@ class PostsController extends BaseController {
 		}
 		
 		// Get the Post object from the database
-		$postid = $_REQUEST["id"];
-		$post = $this->postMapper->findById($postid);
+		$switchname = $_REQUEST["SwitchName"];
+		$switch = $this->switchMapper->findById($postid);
 
 		// Does the post exist?
 		if ($post == NULL) {

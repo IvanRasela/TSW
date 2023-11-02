@@ -42,7 +42,7 @@ class PostMapper {
 		$switchs = array();
 
 		foreach ($switch_db as $switch) {
-			$alias = new User($pswitch["alias"]);
+			$alias = new User($switch["alias"]);
 			array_push($switchs, new Switch($switch["SwitchName"], $switch["Private_UUID"], $switch["Public_UUID"], $switch["LastTimePowerOn"], $switch["MaxTimePowerOn"], $switch["DescriptionSwitch"], $switch["SwitchState"],$alias));
 		}
 

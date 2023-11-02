@@ -39,12 +39,12 @@ class UserMapper {
 		if ($result) {
 			echo "Usuario guardado correctamente en la base de datos.";
 
-			$recipients = 'raselatics@gmail.com';
+			$recipients = $user->getEmail();
 			$headers['From']    = 'ivan.rasela.verin@gmail.com';
-			$headers['To']      = 'raselatics@gmail.com';
+			$headers['To']      = $user->getEmail();
 			$headers['Subject'] = 'Switch has been switched on!';
 			$body = 'The Switch xxxx you are subscribed to has been powered on!!';
-			$params['host'] = '172.17.0.1'; //esta es la IP de la máquina host cuando se usa docker, allí hay un fakesmtp
+			$params['host'] = '172.23.208.1'; //esta es la IP de la máquina host cuando se usa docker, allí hay un fakesmtp
 			$params['port'] = '2525'; // puerto del fakesmtp
 			// Create the mail object using the Mail::factory method
 			$mail_object = Mail::factory('smtp', $params);
