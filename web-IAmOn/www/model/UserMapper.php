@@ -2,7 +2,7 @@ UserMapper.php
 
 <?php
 // file: model/UserMapper.php
-include('Mail.php');
+//include('Mail.php');
 
 require_once(__DIR__."/../core/PDOConnection.php");
 
@@ -39,16 +39,16 @@ class UserMapper {
 		if ($result) {
 			echo "Usuario guardado correctamente en la base de datos.";
 
-			$recipients = $user->getEmail();
+			/*$recipients = $user->getEmail();
 			$headers['From']    = 'ivan.rasela.verin@gmail.com';
 			$headers['To']      = $user->getEmail();
-			$headers['Subject'] = 'Switch has been switched on!';
-			$body = 'The Switch xxxx you are subscribed to has been powered on!!';
+			$headers['Subject'] = 'switchs has been switchsed on!';
+			$body = 'The switchs xxxx you are subscribed to has been powered on!!';
 			$params['host'] = '172.23.208.1'; //esta es la IP de la máquina host cuando se usa docker, allí hay un fakesmtp
 			$params['port'] = '2525'; // puerto del fakesmtp
 			// Create the mail object using the Mail::factory method
 			$mail_object = Mail::factory('smtp', $params);
-			$mail_object->send($recipients, $headers, $body);
+			$mail_object->send($recipients, $headers, $body);*/
 		} else {
 			echo "Error al guardar el usuario en la base de datos.";
 		}

@@ -12,7 +12,7 @@ $errors = $view->getVariable("errors");
 <h1>IAmOn</h1>
             <p>Inicia sesión en tu cuenta</p>
         <?= isset($errors["general"])?$errors["general"]:"" ?>
-            <form action="index.php?controller=switch&amp;action=index" method="POST">
+            <form action="index.php?controller=switchs&amp;action=index" method="POST">
                 <label for="alias">Usuario:</label>
                 <input type="text" id="alias" name="alias" required>
 
@@ -23,7 +23,7 @@ $errors = $view->getVariable("errors");
             </form>
 
             <p>Usuario no registrado?: <a href="index.php?controller=users&amp;action=register">Registrate aquí!</a></p>
-            <p>Iniciar como modo invitado <a href="index.php?controller=switch&amp;action=index">Continuar</a></p>
+            <p>Iniciar como modo invitado <a href="index.php?controller=switchs&amp;action=index">Continuar</a></p>
             <?php $view->moveToFragment("css");?>
             <link rel="stylesheet" type="text/css" src="css/style2.css">
             <?php $view->moveToDefaultFragment(); ?>

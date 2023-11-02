@@ -55,7 +55,7 @@ body {
     display: flex; /*Controlamos la alineación de los elementos secundarios*/
   }
 
-  #SwitchesPropios, #SwitchesSuscritos {
+  #switchsesPropios, #switchsesSuscritos {
     display: inline-block;
     width: 50%; /* O ajusta el ancho según tus necesidades */
     box-sizing: border-box; /* Asegura que el ancho incluye el padding y el borde */
@@ -88,20 +88,20 @@ body {
     float: right;
   }
 
-  #miSwitch1{
+  #miswitchs1{
     background-color: rgb(109, 125, 142);
     padding: 6px;
     border-radius: 10px; /* Borde redondo con un radio de 10px */
     display: flex;
     align-items: center; /* Centra verticalmente */
   }
-  #miSwitch1 p{
+  #miswitchs1 p{
     margin: 0; /* Evita que los párrafos tengan margen */
     padding-right: 10px; /* Agrega espacio a la derecha de los párrafos */
   }
 
-  /* Estilo para el own_switch1 */
-.own_switch1 {
+  /* Estilo para el own_switchs1 */
+.own_switchs1 {
   position: relative;
   display: inline-block;
   width: 60px;
@@ -110,26 +110,26 @@ body {
 }
 
 /* Estilo para el input checkbox (oculto) */
-.own_switch1 input {
+.own_switchs1 input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-.sub_switch1{
+.sub_switchs1{
   position: relative;
   display: inline-block;
   width: 60px;
   height: 34px;
 }
 
-.sub_switch1 input{
+.sub_switchs1 input{
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-/* Estilo para el slider del switch */
+/* Estilo para el slider del switchs */
 .own_slider1 {
   position: absolute;
   cursor: pointer;
