@@ -23,36 +23,34 @@ require_once(__DIR__."/BaseRest.php");
 *
 */
 class PostRest extends BaseRest {
-	private $postMapper;
+	private $SwitchsMapper;
 	private $commentMapper;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->postMapper = new PostMapper();
+		$this->SwitchsMapper = new SwitchsMapper();
 		$this->commentMapper = new CommentMapper();
 	}
 
-	public function getPosts() {
-		$posts = $this->postMapper->findAll();
+	public function getSwitchs() {
+		$switchs = $this->SwitchsMapper->findAll();
 
 		// json_encode Post objects.
 		// since Post objects have private fields, the PHP json_encode will not
 		// encode them, so we will create an intermediate array using getters and
 		// encode it finally
-		$posts_array = array();
-		foreach($posts as $post) {
-			array_push($posts_array, array(
-				"id" => $post->getId(),
-				"title" => $post->getTitle(),
-				"content" => $post->getContent(),
-				"author_id" => $post->getAuthor()->getusername()
+		$switchs_array = array();
+		foreach($switchs as $switch) {
+			array_push($switchs_array, array(
+				"SwitchName" => $switch->getSwitchName(),
+				"Public_UUID" => $switch->getPublic_UUID(),
 			));
 		}
 
 		header($_SERVER['SERVER_PROTOCOL'].' 200 Ok');
 		header('Content-Type: application/json');
-		echo(json_encode($posts_array));
+		echo(json_encode($switchs_array));
 	}
 
 	public function createPost($data) {

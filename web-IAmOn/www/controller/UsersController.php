@@ -68,15 +68,16 @@ class UsersController extends BaseController {
 	*/
 	public function login() {
 		echo("Dentro de login()");
-		var_dump($_POST);
-		if (isset($_POST["alias"]) && isset($_POST["passwd"])){ // reaching via HTTP Post...
+
+		if (isset($_POST["alias"])){ // reaching via HTTP Post...
 			//process login form
 			if ($this->userMapper->isValidUser($_POST["alias"],$_POST["passwd"])) {
 
 				$_SESSION["currentuser"]=$_POST["alias"];
 				
+				echo("Iniciando sesion");
 				// send user to the restricted area (HTTP 302 code)
-				$this->view->redirect("posts", "index");
+				$this->view->redirect("switchs", "index");
 
 			}else{
 				$errors = array();

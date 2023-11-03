@@ -34,30 +34,31 @@ class switchsMapper {
 	* @throws PDOException if a database error occurs
 	* @return mixed Array of switchs instances (without comments)
 	*/
-	public function findAll() {
-		$stmt = $this->db->query("SELECT * FROM Switchs, usuario WHERE usuario.Alias = Switchs.AliasUser");
-		$switchs_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	public function findAll($user) {
+		
+		$stmt = $this->db->query("SELECT * FROM Switchs WHERE Switchs.AliasUser=?");
+		$stmt->execute(array($user));
+		$switchs_db = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		$switchs = array();
 
-		foreach ($switchs_db as $switchs) {
-			$alias = new User($switchs["AliasUser"]);
-			array_push($switchs, new switchs($switchs["SwitchName"], $switchs["Private_UUID"], $switchs["Public_UUID"],$alias, $switchs["DescriptionSwitch"], $switchs["LastTimePowerOn"], $switchs["MaxTimePowerOn"]));
+		foreach ($switchs_db as $switch) {
+			$alias = new User($switch["AliasUser"]);
+			array_push($switchs, new switchs($switch["SwitchName"], $switch["Private_UUID"], $switch["Public_UUID"],$alias, $switch["DescriptionSwitch"], $switch["LastTimePowerOn"], $switch["MaxTimePowerOn"]));
 		}
 
 		return $switchs;
 	}
 
 	public function findIfSuscribe() {
-		$stmt = $this->db->query("SELECT * FROM Suscritos, Usuario WHERE Usuario.Alias = switchs.AliasUser");
+		$stmt = $this->db->query("SELECT * FROM Suscritos, usuario WHERE usuario.Alias = Suscritos.SuscriptorAlias");
 		$switchs_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		$switchs = array();
 
-		foreach ($switchs_db as $switchs) {
-			$alias = new User($switchs["alias"]);
-			array_push($switchs, new Swswitchsitch($switchs["switchsName"], $switchs["Private_UUID"], $switchs["Public_UUID"], $switchs["LastTimePowerOn"], $switchs["MaxTimePowerOn"], $switchs["Descriptionswitchs"],$alias));
-		}
+		foreach ($switchs_db as $switch) {
+			$alias = new User($switch["alias"]);
+			array_push($switchs, new switchs($switch["SwitchName"], $switch["Private_UUID"], $switch["Public_UUID"],$alias, $switch["DescriptionSwitch"], $switch["LastTimePowerOn"], $switch["MaxTimePowerOn"]));		}
 
 		return $switchs;
 	}
@@ -71,17 +72,25 @@ class switchsMapper {
 	* @return Post The switchs instances (without comments). NULL
 	* if the Post is not found
 	*/
-	public function findById($postid){
-		$stmt = $this->db->prepare("SELECT * FROM posts WHERE id=?");
-		$stmt->execute(array($postid));
-		$post = $stmt->fetch(PDO::FETCH_ASSOC);
+	public function findById($publicuuid){
+		$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE Public_UUID=?");
+		$stmt->execute(array($publicuuid));
+		$switchs = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if($post != null) {
-			return new Post(
-			$post["id"],
-			$post["title"],
-			$post["content"],
-			new User($post["author"]));
+		if($switchs != null) {
+			return $switchs;
+		} else {
+			return NULL;
+		}
+	}
+
+	public function findByIdPrivate($uuid){
+		$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE PrivateUUID=?");
+		$stmt->execute(array($uuid));
+		$switchs = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		if($switchs != null) {
+			return $switchs;
 		} else {
 			return NULL;
 		}
@@ -170,9 +179,32 @@ class switchsMapper {
 		* @throws PDOException if a database error occurs
 		* @return void
 		*/
-		public function delete(switchs $switchs) {
-			$stmt = $this->db->prepare("DELETE from switchs WHERE switchsName=?");
-			$stmt->execute(array($switchs->getswitchsName()));
+		public function delete(Switchs $switchs) {
+			$stmt = $this->db->prepare("DELETE from Switchs WHERE SwitchName=?");
+			$stmt->execute(array($switchs->getSwitchsName()));
+		}
+
+		public function createUUID(){
+			do{
+				$uuid4 = Uuid::uuid4();
+			} while (itsOnUse($uuid4));
+			
+    		return $uuid4->toString();
+		}
+
+		public function itsOnUse($uuid){
+			$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE Public_UUID=?");
+			$stmt->execute(array($uuid));
+			$switchs = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE Private_UUID=?");
+			$stmt->execute(array($uuid));
+			$switchs = $stmt->fetch(PDO::FETCH_ASSOC);
+			if($switchs != null) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 	}

@@ -12,7 +12,7 @@ $errors = $view->getVariable("errors");
 <h1>IAmOn</h1>
             <p>Inicia sesión en tu cuenta</p>
         <?= isset($errors["general"])?$errors["general"]:"" ?>
-            <form action="index.php?controller=switchs&amp;action=index" method="POST">
+            <form action="index.php?controller=users&amp;action=login" method="POST">
                 <label for="alias">Usuario:</label>
                 <input type="text" id="alias" name="alias" required>
 

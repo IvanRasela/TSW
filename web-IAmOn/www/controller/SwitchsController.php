@@ -45,13 +45,18 @@ class switchsController extends BaseController {
 	* </ul>
 	*/
 	public function index() {
-		echo("Dentro de la action index de switchsController.php ");
 
+		echo("Dentro de la action index de switchsController.php ");
+		print_r($this->currentUser);
+
+		if (!isset($this->currentUser)) {
+			throw new Exception("Not in session. Adding posts requires login");
+		}
 		// obtain the data from the database
 		$switchs = $this->switchsMapper->findAll();
 
 		// put the array containing Post object to the view
-		$this->view->setVariable("switchs", $switchs);
+		$this->view->setVariable("Switchs", $switchs);
 
 		// render the view (/view/posts/index.php)
 		$this->view->render("posts", "index");
@@ -83,29 +88,31 @@ class switchsController extends BaseController {
 	*/
 	/*COMPLETAR*/ 
 	public function view(){
-		if (!isset($_GET["id"])) {
+		$user = $this->currentUser->getAlias();
+
+		if (!isset($_GET["SwitchName"])) {
 			throw new Exception("id is mandatory");
 		}
 
 		$switchsPK = $_GET["Public_UUID"];
 
 		// find the Post object in the database
-		$switchs = $this->switchsMapper->findByIdWithComments($postid);
+		$switchs = $this->SwitchsMapper->findAll($user);
 
-		if ($post == NULL) {
-			throw new Exception("no such post with id: ".$postid);
+		if ($switchs == NULL) {
+			throw new Exception("no such post with id: ".$switchs);
 		}
 
 		// put the Post object to the view
-		$this->view->setVariable("post", $post);
+		$this->view->setVariable("switchs", $switchs);
 
 		// check if comment is already on the view (for example as flash variable)
 		// if not, put an empty Comment for the view
-		$comment = $this->view->getVariable("comment");
-		$this->view->setVariable("comment", ($comment==NULL)?new Comment():$comment);
+		//$comment = $this->view->getVariable("comment");
+		//$this->view->setVariable("comment", ($comment==NULL)?new Comment():$comment);
 
 		// render the view (/view/posts/view.php)
-		$this->view->render("posts", "view");
+		$this->view->render("switchs", "view");
 
 	}
 
@@ -138,38 +145,47 @@ class switchsController extends BaseController {
 	*/
 	public function add() {
 		if (!isset($this->currentUser)) {
-			throw new Exception("Not in session. Adding posts requires login");
+			throw new Exception("Not in session. Adding switchs requires login");
 		}
 
-		$post = new Post();
+		$switch = new Switchs();
 
 		if (isset($_POST["submit"])) { // reaching via HTTP Post...
 
 			// populate the Post object with data form the form
-			$post->setTitle($_POST["title"]);
-			$post->setContent($_POST["content"]);
+			$switch->setSwitchName($_POST["SwitchName"]);
+			$switch->setDescriptionSwitch($_POST["content"]);
 
 			// The user of the Post is the currentUser (user in session)
-			$post->setAuthor($this->currentUser);
+			$switch->setAliasUser($this->currentUser);
+
+			$publicuuid = $this->SwitchsMapper->createUUID();
+			$switch->setPublic_UUID($publicuuid);
+			$privateuuid = $this->SwitchsMapper->createUUID();
+			$switch->setPublic_UUID($privateuuid);
+			$maxtime = 120;
+			$switch->setMaxTimePowerOn($maxtime);
+			$lasttime = null;
+			$switch->setLastTimePowerOn($lastime);
 
 			try {
 				// validate Post object
-				$post->checkIsValidForCreate(); // if it fails, ValidationException
+				$switch->checkIsValidForCreate(); // if it fails, ValidationException
 
 				// save the Post object into the database
-				$this->postMapper->save($post);
+				$this->SwitchsMapper->save($switch);
 
 				// POST-REDIRECT-GET
 				// Everything OK, we will redirect the user to the list of posts
 				// We want to see a message after redirection, so we establish
 				// a "flash" message (which is simply a Session variable) to be
 				// get in the view after redirection.
-				$this->view->setFlash(sprintf(i18n("Post \"%s\" successfully added."),$post ->getTitle()));
+				$this->view->setFlash(sprintf(i18n("Switch \"%s\" successfully added."),$switch ->getSwitchName()));
 
 				// perform the redirection. More or less:
 				// header("Location: index.php?controller=posts&action=index")
 				// die();
-				$this->view->redirect("posts", "index");
+				$this->view->redirect("switchs", "index");
 
 			}catch(ValidationException $ex) {
 				// Get the errors array inside the exepction...
@@ -219,8 +235,8 @@ class switchsController extends BaseController {
 	* @return void
 	*/
 	public function edit() {
-		if (!isset($_REQUEST["id"])) {
-			throw new Exception("A post id is mandatory");
+		if (!isset($_REQUEST["Public_UUID"])) {
+			throw new Exception("A Public UUID is mandatory");
 		}
 
 		if (!isset($this->currentUser)) {
@@ -229,24 +245,22 @@ class switchsController extends BaseController {
 
 
 		// Get the Post object from the database
-		$postid = $_REQUEST["id"];
-		$post = $this->postMapper->findById($postid);
+		$suscribeuuid = $_REQUEST["Public_UUID"];
+		$switchs = $this->SwitchsMapper->findById($suscribeuuid);
 
 		// Does the post exist?
-		if ($post == NULL) {
-			throw new Exception("no such post with id: ".$postid);
+		if ($switchs == NULL) {
+			throw new Exception("no such switch with id: ".$suscribeuuid);
 		}
 
 		// Check if the Post author is the currentUser (in Session)
-		if ($post->getAuthor() != $this->currentUser) {
-			throw new Exception("logged user is not the author of the post id ".$postid);
+		if ($switchs->getAliasUser() == $this->currentUser) {
+			throw new Exception("u cant suscribe to your own switch".$suscribeuuid);
 		}
 
 		if (isset($_POST["submit"])) { // reaching via HTTP Post...
 
-			// populate the Post object with data form the form
-			$post->setTitle($_POST["title"]);
-			$post->setContent($_POST["content"]);
+			// Agregarlo a un array de Switches del usuario
 
 			try {
 				// validate Post object
@@ -265,7 +279,7 @@ class switchsController extends BaseController {
 				// perform the redirection. More or less:
 				// header("Location: index.php?controller=posts&action=index")
 				// die();
-				$this->view->redirect("posts", "index");
+				$this->view->redirect("Switchs", "index");
 
 			}catch(ValidationException $ex) {
 				// Get the errors array inside the exepction...
@@ -303,29 +317,29 @@ class switchsController extends BaseController {
 	* @return void
 	*/
 	public function delete() {
-		if (!isset($_POST["id"])) {
-			throw new Exception("id is mandatory");
+		if (!isset($_POST["Private_UUID"])) {
+			throw new Exception("Private_UUID is mandatory");
 		}
 		if (!isset($this->currentUser)) {
-			throw new Exception("Not in session. Editing posts requires login");
+			throw new Exception("Not in session. Delete switchs requires login");
 		}
 		
 		// Get the Post object from the database
-		$postid = $_REQUEST["id"];
-		$post = $this->postMapper->findById($postid);
+		$switchid = $_REQUEST["Private_UUID"];
+		$switch = $this->SwitchsMapper->findByIdPrivate($switchid);
 
 		// Does the post exist?
-		if ($post == NULL) {
-			throw new Exception("no such post with id: ".$postid);
+		if ($switch == NULL) {
+			throw new Exception("no such switch with Private_UUID: ".$switchid);
 		}
 
 		// Check if the Post author is the currentUser (in Session)
-		if ($post->getAuthor() != $this->currentUser) {
-			throw new Exception("Post author is not the logged user");
+		if ($switch->getAliasUser() != $this->currentUser) {
+			throw new Exception("Switch owner is not the logged user");
 		}
 
 		// Delete the Post object from the database
-		$this->postMapper->delete($post);
+		$this->SwitchsMapper->delete($switch);
 
 		// POST-REDIRECT-GET
 		// Everything OK, we will redirect the user to the list of posts
