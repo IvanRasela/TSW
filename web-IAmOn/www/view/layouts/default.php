@@ -25,7 +25,7 @@ $currentuser = $view->getVariable("currentusername");
 				<li><a href="index.php?controller=switchs&amp;action=index">Posts</a></li>
 
 				<?php if (isset($currentuser)): ?>
-					<li><?= sprintf(i18n("Hello %s"), $currentuser) ?>
+					<li><?= sprintf($currentuser) ?>
 						<a 	href="index.php?controller=users&amp;action=logout">(Logout)</a>
 					</li>
 

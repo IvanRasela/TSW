@@ -47,13 +47,13 @@ class switchsController extends BaseController {
 	public function index() {
 
 		echo("Dentro de la action index de switchsController.php ");
-		print_r($this->currentUser);
+		print_r($this->currentUser->getAlias());
 
 		if (!isset($this->currentUser)) {
 			throw new Exception("Not in session. Adding posts requires login");
 		}
 		// obtain the data from the database
-		$switchs = $this->switchsMapper->findAll();
+		$switchs = $this->switchsMapper->findAll($this->currentUser);
 
 		// put the array containing Post object to the view
 		$this->view->setVariable("Switchs", $switchs);
@@ -153,34 +153,34 @@ class switchsController extends BaseController {
 		if (isset($_POST["submit"])) { // reaching via HTTP Post...
 
 			// populate the Post object with data form the form
-			$switch->setSwitchName($_POST["SwitchName"]);
-			$switch->setDescriptionSwitch($_POST["content"]);
+			$switch->setSwitchsName($_POST["SwitchName"]);
+			$switch->setDescriptionswitchs($_POST["Description"]);
 
 			// The user of the Post is the currentUser (user in session)
 			$switch->setAliasUser($this->currentUser);
 
-			$publicuuid = $this->SwitchsMapper->createUUID();
+			$publicuuid = $this->switchsMapper->createUUID();
 			$switch->setPublic_UUID($publicuuid);
-			$privateuuid = $this->SwitchsMapper->createUUID();
-			$switch->setPublic_UUID($privateuuid);
+			$privateuuid = $this->switchsMapper->createUUID();
+			$switch->setPrivate_UUID($privateuuid);
 			$maxtime = 120;
 			$switch->setMaxTimePowerOn($maxtime);
 			$lasttime = null;
-			$switch->setLastTimePowerOn($lastime);
+			$switch->setLastTimePowerOn($lasttime);
 
 			try {
 				// validate Post object
 				$switch->checkIsValidForCreate(); // if it fails, ValidationException
 
 				// save the Post object into the database
-				$this->SwitchsMapper->save($switch);
+				$this->switchsMapper->save($switch);
 
 				// POST-REDIRECT-GET
 				// Everything OK, we will redirect the user to the list of posts
 				// We want to see a message after redirection, so we establish
 				// a "flash" message (which is simply a Session variable) to be
 				// get in the view after redirection.
-				$this->view->setFlash(sprintf(i18n("Switch \"%s\" successfully added."),$switch ->getSwitchName()));
+				$this->view->setFlash(sprintf(("Switch \"%s\" successfully added."),$switch ->getSwitchsName()));
 
 				// perform the redirection. More or less:
 				// header("Location: index.php?controller=posts&action=index")
@@ -196,7 +196,7 @@ class switchsController extends BaseController {
 		}
 
 		// Put the Post object visible to the view
-		$this->view->setVariable("post", $post);
+		$this->view->setVariable("switchs", $switch);
 
 		// render the view (/view/posts/add.php)
 		$this->view->render("posts", "add");
@@ -296,6 +296,68 @@ class switchsController extends BaseController {
 		$this->view->render("posts", "edit");
 	}
 
+	public function suscribe() {
+		if (!isset($_REQUEST["Public_UUID"])) {
+			throw new Exception("A Public UUID is mandatory");
+		}
+
+		if (!isset($this->currentUser)) {
+			throw new Exception("Not in session. Editing posts requires login");
+		}
+
+
+		// Get the Post object from the database
+		$suscribeuuid = $_REQUEST["Public_UUID"];
+		$switchs = $this->SwitchsMapper->findById($suscribeuuid);
+
+		// Does the post exist?
+		if ($switchs == NULL) {
+			throw new Exception("no such switch with id: ".$suscribeuuid);
+		}
+
+		// Check if the Post author is the currentUser (in Session)
+		if ($switchs->getAliasUser() == $this->currentUser) {
+			throw new Exception("u cant suscribe to your own switch".$suscribeuuid);
+		}
+
+		if (isset($_POST["submit"])) { // reaching via HTTP Post...
+
+			// Agregarlo a un array de Switches del usuario
+
+			try {
+				// validate Post object
+				$post->checkIsValidForUpdate(); // if it fails, ValidationException
+
+				// update the Post object in the database
+				$this->postMapper->update($post);
+
+				// POST-REDIRECT-GET
+				// Everything OK, we will redirect the user to the list of posts
+				// We want to see a message after redirection, so we establish
+				// a "flash" message (which is simply a Session variable) to be
+				// get in the view after redirection.
+				$this->view->setFlash(sprintf(i18n("Post \"%s\" successfully updated."),$post ->getTitle()));
+
+				// perform the redirection. More or less:
+				// header("Location: index.php?controller=posts&action=index")
+				// die();
+				$this->view->redirect("Switchs", "index");
+
+			}catch(ValidationException $ex) {
+				// Get the errors array inside the exepction...
+				$errors = $ex->getErrors();
+				// And put it to the view as "errors" variable
+				$this->view->setVariable("errors", $errors);
+			}
+		}
+
+		// Put the Post object visible to the view
+		$this->view->setVariable("post", $post);
+
+		// render the view (/view/posts/add.php)
+		$this->view->render("posts", "edit");
+	}
+
 	/**
 	* Action to delete a post
 	*
@@ -326,7 +388,7 @@ class switchsController extends BaseController {
 		
 		// Get the Post object from the database
 		$switchid = $_REQUEST["Private_UUID"];
-		$switch = $this->SwitchsMapper->findByIdPrivate($switchid);
+		$switch = $this->switchsMapper->findByIdPrivate($switchid);
 
 		// Does the post exist?
 		if ($switch == NULL) {
@@ -334,24 +396,24 @@ class switchsController extends BaseController {
 		}
 
 		// Check if the Post author is the currentUser (in Session)
-		if ($switch->getAliasUser() != $this->currentUser) {
+		/*if ($switch->getAliasUser()->getAlias() != $this->currentUser) {
 			throw new Exception("Switch owner is not the logged user");
-		}
+		}*/
 
 		// Delete the Post object from the database
-		$this->SwitchsMapper->delete($switch);
+		$this->switchsMapper->delete($switch);
 
 		// POST-REDIRECT-GET
 		// Everything OK, we will redirect the user to the list of posts
 		// We want to see a message after redirection, so we establish
 		// a "flash" message (which is simply a Session variable) to be
 		// get in the view after redirection.
-		$this->view->setFlash(sprintf(i18n("Post \"%s\" successfully deleted."),$post ->getTitle()));
+		$this->view->setFlash(sprintf(("Switch \"%s\" successfully deleted."),$switch->getSwitchsName()));
 
 		// perform the redirection. More or less:
 		// header("Location: index.php?controller=posts&action=index")
 		// die();
-		$this->view->redirect("posts", "index");
+		$this->view->redirect("Switchs", "index");
 
 	}
 }

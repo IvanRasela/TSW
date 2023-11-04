@@ -151,23 +151,23 @@ class PostRest extends BaseRest {
 		}
 	}
 
-	public function deletePost($postId) {
+	public function deleteSwitch($switchuuid) {
 		$currentUser = parent::authenticateUser();
-		$post = $this->postMapper->findById($postId);
+		$switch = $this->SwitchsMapper->findById($switchuuid);
 
-		if ($post == NULL) {
+		if ($switch == NULL) {
 			header($_SERVER['SERVER_PROTOCOL'].' 400 Bad request');
 			echo("Post with id ".$postId." not found");
 			return;
 		}
 		// Check if the Post author is the currentUser (in Session)
-		if ($post->getAuthor() != $currentUser) {
+		if ($switch->getAliasUser->getAlias() != $currentUser) {
 			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
 			echo("you are not the author of this post");
 			return;
 		}
 
-		$this->postMapper->delete($post);
+		$this->SwitchsMapper->delete($switch);
 
 		header($_SERVER['SERVER_PROTOCOL'].' 204 No Content');
 	}

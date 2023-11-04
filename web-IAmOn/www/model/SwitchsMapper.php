@@ -3,7 +3,6 @@ switchsMapper.php
 <?php
 // file: model/PostMapper.php
 require_once(__DIR__."/../core/PDOConnection.php");
-
 require_once(__DIR__."/../model/User.php");
 require_once(__DIR__."/../model/switchs.php");
 
@@ -36,9 +35,9 @@ class switchsMapper {
 	*/
 	public function findAll($user) {
 		
-		$stmt = $this->db->query("SELECT * FROM Switchs WHERE Switchs.AliasUser=?");
-		$stmt->execute(array($user));
-		$switchs_db = $stmt->fetch(PDO::FETCH_ASSOC);
+		$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE Switchs.AliasUser=?");
+		$stmt->execute(array($user->getAlias()));
+		$switchs_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		$switchs = array();
 
@@ -78,19 +77,33 @@ class switchsMapper {
 		$switchs = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		if($switchs != null) {
-			return $switchs;
+			return new Switchs(
+			$switchs["SwitchName"],
+			$switchs["Private_UUID"],
+			$switchs["Public_UUID"],
+			new User($switchs["AliasUser"]),
+			$switchs["DescriptionSwitch"],
+			$switchs["LastTimePowerOn"],
+			$switchs["MaxTimePowerOn"]);
 		} else {
 			return NULL;
 		}
 	}
 
 	public function findByIdPrivate($uuid){
-		$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE PrivateUUID=?");
+		$stmt = $this->db->prepare("SELECT * FROM Switchs WHERE Private_UUID=?");
 		$stmt->execute(array($uuid));
 		$switchs = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		if($switchs != null) {
-			return $switchs;
+			return new Switchs(
+			$switchs["SwitchName"],
+			$switchs["Private_UUID"],
+			$switchs["Public_UUID"],
+			new User($switchs["AliasUser"]),
+			$switchs["DescriptionSwitch"],
+			$switchs["LastTimePowerOn"],
+			$switchs["MaxTimePowerOn"]);
 		} else {
 			return NULL;
 		}
@@ -155,8 +168,8 @@ class switchsMapper {
 		* @return int The mew post id
 		*/
 		public function save(switchs $switchs) {
-			$stmt = $this->db->prepare("INSERT INTO switchs(switchsName, Private_UUID, Public_UUID, LastTimePowerOn, MaxTimePowerOn, Descriptionswitchs, AliasUser) values (?,?,?,?,?,?,?)");
-			$stmt->execute(array($switchs->getswitchsName(), $switchs->getPrivate_UUID(), $switchs->getPublic_UUID(),$switchs->getLastTimePowerOn(),$switchs->getMaxTimePowerOn(),$switchs->getDescriptionSwicth(),$switchs->getAliasUser()->getAlias()));
+			$stmt = $this->db->prepare("INSERT INTO Switchs(SwitchName, Private_UUID, Public_UUID, LastTimePowerOn, MaxTimePowerOn, DescriptionSwitch, AliasUser) values (?,?,?,?,?,?,?)");
+			$stmt->execute(array($switchs->getswitchsName(), $switchs->getPrivate_UUID(), $switchs->getPublic_UUID(),$switchs->getLastTimePowerOn(),$switchs->getMaxTimePowerOn(),$switchs->getDescriptionswitchs(),$switchs->getAliasUser()->getAlias()));
 			return $this->db->lastInsertId();
 		}
 
@@ -180,16 +193,27 @@ class switchsMapper {
 		* @return void
 		*/
 		public function delete(Switchs $switchs) {
-			$stmt = $this->db->prepare("DELETE from Switchs WHERE SwitchName=?");
-			$stmt->execute(array($switchs->getSwitchsName()));
+			$stmt = $this->db->prepare("DELETE from Switchs WHERE Private_UUID=?");
+			$stmt->execute(array($switchs->getPrivate_UUID()));
 		}
 
 		public function createUUID(){
-			do{
-				$uuid4 = Uuid::uuid4();
-			} while (itsOnUse($uuid4));
+			do {
+				$miUUID = $this->generarUUID();
+			} while ($this->itsOnUse($miUUID));
 			
-    		return $uuid4->toString();
+    		return $miUUID;
+		}
+
+		public function generarUUID() {
+			return sprintf(
+				'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+				mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+				mt_rand(0, 0xffff),
+				mt_rand(0, 0x0fff) | 0x4000,
+				mt_rand(0, 0x3fff) | 0x8000,
+				mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+			);
 		}
 
 		public function itsOnUse($uuid){

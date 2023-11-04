@@ -89,6 +89,10 @@ class switchs {
 		return $this->switchsName;
 	}
 
+	public function setSwitchsName($SwitchsName) {
+		$this->switchsName = $SwitchsName;
+	}
+
 	/**
 	* Gets the title of this post
 	*
