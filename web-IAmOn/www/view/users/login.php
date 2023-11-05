@@ -22,8 +22,8 @@ $errors = $view->getVariable("errors");
                 <input type="submit" value="<?= "Login" ?>">
             </form>
 
-            <p>Usuario no registrado?: <a href="index.php?controller=users&amp;action=register">Registrate aquí!</a></p>
-            <p>Iniciar como modo invitado <a href="index.php?controller=switchs&amp;action=index">Continuar</a></p>
+            
+            <p>Usuario no registrado?: <a href="index.php?controller=switchs&amp;action=index">Continuar</a></p>
             <?php $view->moveToFragment("css");?>
             <link rel="stylesheet" type="text/css" src="css/style2.css">
             <?php $view->moveToDefaultFragment(); ?>

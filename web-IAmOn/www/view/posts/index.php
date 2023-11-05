@@ -12,7 +12,11 @@ $currentuser = $view->getVariable("currentusername");
 
 $view->setVariable("title", "Switchs");
 
-?><h1>Mis Switches</h1>
+?>
+&nbsp;
+<a href="index.php?controller=switchs&amp;action=find">Buscar switch</a>
+
+<h1>Mis Switches</h1>
 <table border="1">
     <tr>
         <th>Switch Name</th>
@@ -22,7 +26,8 @@ $view->setVariable("title", "Switchs");
     </tr>
 
     <!-- Iteración sobre los switches -->
-    <?php foreach ($switches as $switchs): ?>
+    <?php if($switches != NULL )
+            foreach ($switches as $switchs): ?>
         <tr>
             <td>
                 <a href="index.php?controller=switchs&amp;action=view&amp;Public_UUID=<?= $switchs->getPublic_UUID() ?>"><?= htmlentities($switchs->getSwitchsName()) ?></a>
@@ -59,6 +64,7 @@ $view->setVariable("title", "Switchs");
 	<a href="index.php?controller=switchs&amp;action=add">Create switch</a>
 <?php endif; ?>
 
+
 <!-- HTML para la segunda tabla -->
 <h2>Switches Suscritos</h2>
 <table border="1">
@@ -70,7 +76,8 @@ $view->setVariable("title", "Switchs");
     </tr>
 
     <!-- Iteración sobre los switches suscritos -->
-    <?php foreach ($switchesSuscritos as $switches): ?>
+    <?php if($switchesSuscritos != NULL )
+            foreach ($switchesSuscritos as $switches): ?>
         <tr>
             <!-- ... (repetir la estructura para la segunda tabla) ... -->
 			<td>

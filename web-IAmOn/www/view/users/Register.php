@@ -26,3 +26,5 @@ $view->setVariable("title", "Register");
 
                 <input type="submit" value="Registrarse">
 
+                <p>Ya tienes cuenta?: <a href="index.php?controller=users&amp;action=login">Inicia sesion aquí!</a></p>
+

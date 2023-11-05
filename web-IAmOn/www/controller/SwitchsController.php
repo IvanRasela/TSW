@@ -47,18 +47,15 @@ class switchsController extends BaseController {
 	public function index() {
 
 		echo("Dentro de la action index de switchsController.php ");
-		print_r($this->currentUser->getAlias());
 
-		if (!isset($this->currentUser)) {
-			throw new Exception("Not in session. Adding posts requires login");
+
+		if (isset($this->currentUser)) {
+			$switchs = $this->switchsMapper->findAll($this->currentUser);
+			$switchsSuscritos = $this->switchsMapper->findIfSuscribe($this->currentUser);
+			$this->view->setVariable("Switchs", $switchs);
+			$this->view->setVariable("SwitchsSuscritos", $switchsSuscritos);
 		}
-		// obtain the data from the database
-		$switchs = $this->switchsMapper->findAll($this->currentUser);
-		$switchsSuscritos = $this->switchsMapper->findIfSuscribe($this->currentUser);
-
-		// put the array containing Post object to the view
-		$this->view->setVariable("Switchs", $switchs);
-		$this->view->setVariable("SwitchsSuscritos", $switchsSuscritos);
+		
 
 		// render the view (/view/posts/index.php)
 		$this->view->render("posts", "index");
@@ -90,23 +87,22 @@ class switchsController extends BaseController {
 	*/
 	/*COMPLETAR*/ 
 	public function view(){
-		$user = $this->currentUser->getAlias();
 
-		if (!isset($_GET["SwitchName"])) {
-			throw new Exception("id is mandatory");
+		if (!isset($_GET["Public_UUID"])) {
+			throw new Exception("Public_UUID is mandatory");
 		}
 
 		$switchsPK = $_GET["Public_UUID"];
 
 		// find the Post object in the database
-		$switchs = $this->SwitchsMapper->findAll($user);
+		$switch = $this->switchsMapper->findById($switchsPK);
 
-		if ($switchs == NULL) {
+		if ($switch == NULL) {
 			throw new Exception("no such post with id: ".$switchs);
 		}
 
 		// put the Post object to the view
-		$this->view->setVariable("switchs", $switchs);
+		$this->view->setVariable("switch", $switch);
 
 		// check if comment is already on the view (for example as flash variable)
 		// if not, put an empty Comment for the view
@@ -114,7 +110,7 @@ class switchsController extends BaseController {
 		//$this->view->setVariable("comment", ($comment==NULL)?new Comment():$comment);
 
 		// render the view (/view/posts/view.php)
-		$this->view->render("switchs", "view");
+		$this->view->render("posts", "view");
 
 	}
 
@@ -296,6 +292,48 @@ class switchsController extends BaseController {
 
 		// render the view (/view/posts/add.php)
 		$this->view->render("posts", "edit");
+	}
+
+	public function find() {
+		if (!isset($_REQUEST["uuid"])) {
+			throw new Exception("A UUID is mandatory");
+		}
+
+		// Get the Post object from the database
+		$suscribeuuid = $_REQUEST["uuid"];
+		$switchs = $this->SwitchsMapper->findById($suscribeuuid);
+
+
+		if ($switchs == NULL) {
+			$switchPrivate = $this->SwitchsMapper->findByIdPrivate($suscribeuuid);
+		}
+
+		if ($switchs == NULL) {
+			throw new Exception("no such switch with id: ".$suscribeuuid);
+		}
+
+		if (isset($_POST["submit"])) { // reaching via HTTP Post...
+
+			// Agregarlo a un array de Switches del usuario
+
+		// put the Post object to the view
+		if ($switchs != NULL) {
+			$this->view->setVariable("switch", $switch);
+		}
+
+		if ($switchPrivate != NULL) {
+			$this->view->setVariable("switchPrivate", $switch);
+		}
+
+		// check if comment is already on the view (for example as flash variable)
+		// if not, put an empty Comment for the view
+		//$comment = $this->view->getVariable("comment");
+		//$this->view->setVariable("comment", ($comment==NULL)?new Comment():$comment);
+
+		// render the view (/view/posts/view.php)
+		$this->view->render("posts", "find");
+		}
+
 	}
 
 	public function suscribe() {
