@@ -49,15 +49,23 @@ class switchsMapper {
 		return $switchs;
 	}
 
-	public function findIfSuscribe() {
-		$stmt = $this->db->query("SELECT * FROM Suscritos, usuario WHERE usuario.Alias = Suscritos.SuscriptorAlias");
+	public function findIfSuscribe($user) {
+		$switchList = [];
+
+		$stmt = $this->db->prepare("SELECT * FROM Suscriptores WHERE Suscriptores.SuscriptorAlias=?");
+		$stmt->execute(array($user->getAlias()));
 		$switchs_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		$switchs = array();
 
-		foreach ($switchs_db as $switch) {
-			$alias = new User($switch["alias"]);
-			array_push($switchs, new switchs($switch["SwitchName"], $switch["Private_UUID"], $switch["Public_UUID"],$alias, $switch["DescriptionSwitch"], $switch["LastTimePowerOn"], $switch["MaxTimePowerOn"]));		}
+		foreach ($switchs_db as $switch){
+			$sw = $this->findById($switch["Public_UUID"]);
+			$switchList[] = $sw;
+		}
+
+		foreach ($switchList as $switch) {
+			//$alias = new User($switch->getAliasUser());
+			array_push($switchs, new switchs($switch->getSwitchsName(), $switch->getPrivate_UUID(), $switch->getPublic_UUID(),$switch->getAliasUser(), $switch->getDescriptionswitchs(), $switch->getLastTimePowerOn(), $switch->getMaxTimePowerOn()));		}
 
 		return $switchs;
 	}
@@ -167,9 +175,15 @@ class switchsMapper {
 		* @throws PDOException if a database error occurs
 		* @return int The mew post id
 		*/
-		public function save(switchs $switchs) {
+		public function save(Switchs $switchs) {
 			$stmt = $this->db->prepare("INSERT INTO Switchs(SwitchName, Private_UUID, Public_UUID, LastTimePowerOn, MaxTimePowerOn, DescriptionSwitch, AliasUser) values (?,?,?,?,?,?,?)");
 			$stmt->execute(array($switchs->getswitchsName(), $switchs->getPrivate_UUID(), $switchs->getPublic_UUID(),$switchs->getLastTimePowerOn(),$switchs->getMaxTimePowerOn(),$switchs->getDescriptionswitchs(),$switchs->getAliasUser()->getAlias()));
+			return $this->db->lastInsertId();
+		}
+
+		public function suscribeTo(Switchs $switch) {
+			$stmt = $this->db->prepare("INSERT INTO Suscriptores(SuscriptorAlias, Public_UUID) values (?,?)");
+			$stmt->execute(array($switchs->getswitchsName(),$switchs->getPublic_UUID()));
 			return $this->db->lastInsertId();
 		}
 
@@ -195,6 +209,11 @@ class switchsMapper {
 		public function delete(Switchs $switchs) {
 			$stmt = $this->db->prepare("DELETE from Switchs WHERE Private_UUID=?");
 			$stmt->execute(array($switchs->getPrivate_UUID()));
+		}
+
+		public function desuscribeTo(Switchs $switchs) {
+			$stmt = $this->db->prepare("DELETE from Suscriptores WHERE Public_UUID=?");
+			$stmt->execute(array($switchs->getPublic_UUID()));
 		}
 
 		public function createUUID(){
